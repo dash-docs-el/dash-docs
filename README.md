@@ -1,4 +1,4 @@
-# Helm Dash
+# Dash Docs
 
 [![Build Status](https://api.travis-ci.org/areina/helm-dash.svg?branch=master)](http://travis-ci.org/areina/helm-dash)
 [![Coverage Status](https://img.shields.io/coveralls/areina/helm-dash.svg)](https://coveralls.io/r/areina/helm-dash?branch=master)
@@ -9,24 +9,13 @@
 
 ## What's it
 
-This package uses [Dash](http://www.kapeli.com/dash) docsets inside
-emacs to browse documentation. Here's an
-[article](http://puntoblogspot.blogspot.com.es/2014/01/ann-helm-dash-documentation-browser-for.html)
-explaining the basic usage of it.
+This package provides an elisp interface to query and show documenation using
+[Dash](http://www.kapeli.com/dash) docsets. 
 
 It doesn't require Dash app.
 
-![](https://raw.github.com/areina/helm-dash/master/misc/helm-dash.gif)
-
-## What's not
-
-If you're looking for dash.el, the list library, please go to
-[dash.el](http://www.github.com/magnars/dash.el)
-
-
 ## Requirements
 
-- [helm](https://github.com/emacs-helm/helm)
 - sqlite3
 
 ## Installation
@@ -34,22 +23,22 @@ If you're looking for dash.el, the list library, please go to
 It's available on [MELPA](https://melpa.org).
 
 Now, it's possible to choose between install the stable or development version
-of helm-dash. [Here](https://github.com/milkypostman/melpa#stable-packages)
+of dash-docs. [Here](https://github.com/milkypostman/melpa#stable-packages)
 there is an explanation about stable packages and MELPA and
-[here](https://github.com/areina/helm-dash/tags) a list of our tags.
+[here](https://github.com/gilbertw1/dash-docs/tags) a list of our tags.
 
-`m-x package-install helm-dash RET`
+`m-x package-install dash-docs RET`
 
 
 ## Installing docsets
 
-Helm-dash uses the same docsets as [Dash](http://www.kapeli.com/dash).
-You can install them with `m-x helm-dash-install-docset` for the
-official docsets or `m-x helm-dash-install-user-docset` for user
+Dash-docs uses the same docsets as [Dash](http://www.kapeli.com/dash).
+You can install them with `m-x dash-docs-install-docset` for the
+official docsets or `m-x dash-docs-install-user-docset` for user
 contributed docsets (experimental).
 
 To install a docset from a file in your drive you can use `m-x
-helm-dash-install-docset-from-file'. That function takes as input
+dash-docs-install-docset-from-file'. That function takes as input
 a `tgz` file that you obtained, starting from a folder named `<docset
 name>.docset`, with the command:
 
@@ -59,34 +48,31 @@ as explained [here](https://kapeli.com/docsets#dashdocsetfeed).
 
 ## Usage
 
-`m-x helm-dash RET` will run helm with your active docsets
-loaded. Typing substrings of what you search will find-as-you-type.
+Search all currently enabled docsets (docsets in `dash-docs-docsets` or 
+`dash-docs-common-docsets`):
 
-- The search starts from 3 chars.
-- Install new docsets with m-x helm-dash-install-docset
-- After installing a new docset, add the name of the docset to
-  `helm-dash-common-docsets' or in 'helm-dash-docsets' (which is ment
-  to be buffer local)
+    (dash-docs-search "<pattern>")
+    
+Search a specific docset:
 
-`m-x helm-dash-at-point RET` is like helm-dash, but it will prefill
-the search input with the symbol at point.
-
-The command `helm-dash-reset-connections` will clear the connections
+    (dash-docs-search-docset "<docset>" "<pattern>")
+    
+The command `dash-docs-reset-connections` will clear the connections
 to all sqlite db's. Use it in case of errors when adding new docsets.
-The next call to `helm-dash` will recreate them.
+The next call to a search function will recreate them.
 
 ## Variables to customize
 
-`helm-dash-docsets-path` is the prefix for your docsets. Defaults to ~/.docsets
+`dash-docs-docsets-path` is the prefix for your docsets. Defaults to ~/.docsets
 
-`helm-dash-min-length` tells helm-dash from which length to start
+`dash-docs-min-length` tells dash-docs from which length to start
 searching. Defaults to 3.
 
-`helm-dash-browser-func` is a function to encapsulate the way to browse
+`dash-docs-browser-func` is a function to encapsulate the way to browse
 Dash' docsets. Defaults to browse-url. For example, if you want to use eww to
-browse your docsets, you can do: `(setq helm-dash-browser-func 'eww)`.
+browse your docsets, you can do: `(setq dash-docs-browser-func 'eww)`.
 
-When `helm-dash-enable-debugging` is non-nil stderr from sqlite queries is
+When `dash-docs-enable-debugging` is non-nil stderr from sqlite queries is
 captured and displayed in a buffer. The default value is `t`. Setting this
 to `nil` may speed up queries on some machines (capturing stderr requires
 the creation and deletion of a temporary file for each query).
@@ -96,7 +82,7 @@ the creation and deletion of a temporary file for each query).
 
 ### Common docsets
 
-`helm-dash-common-docsets' is a list that should contain the docsets
+`dash-docs-common-docsets' is a list that should contain the docsets
 to be active always. In all buffers.
 
 ### Buffer local docsets
@@ -110,7 +96,7 @@ docsets sets.
 ``` elisp
 (defun go-doc ()
   (interactive)
-  (setq-local helm-dash-docsets '("Go")))
+  (setq-local dash-docs-docsets '("Go")))
 
 (add-hook 'go-mode-hook 'go-doc)
 ```
@@ -129,14 +115,14 @@ sqlite queries. Provisionally, we're executing shell-commands directly. Our
 idea is come back to use [esqlite](http://www.github.com/mhayashi1120/Emacs-esqlite)
 when some issues will be fixed.
 
-helm-dash has been tested only in linux.  We've been notified that it
+dash-docs has been tested only in linux.  We've been notified that it
 doesn't work in Mac, so we ask for elisp hackers who own something
 that runs Mac OSX if they could take a look at it.
 
 Hints: It looks like something with 'end of line' differences. The
 suspicious are
 [esqlite](http://www.github.com/mhayashi1120/Emacs-esqlite) (which
-helm-dash requires) or
+dash-docs requires) or
 [pcsv](http://www.github.com/mhayashi1120/Emacs-pcsv) (which esqlite
 requires)
 
@@ -151,26 +137,26 @@ just fine
 
 make sure you don't have sqlite3 .mode column but .mode list (the default). check your .sqliterc
 
-- When selecting an item in helm-dash, no browser lookup occurs with firefox >= 38.0.and emacs >= 24.4
+- When selecting an item in dash-docs, no browser lookup occurs with firefox >= 38.0.and emacs >= 24.4
 
 try:
 ```
 (setq browse-url-browser-function 'browse-url-generic
       browse-url-generic-program "/path/to/firefox")
-(setq helm-dash-browser-func 'browse-url-generic)
+(setq dash-docs-browser-func 'browse-url-generic)
 ```
 
 
 ## Contribution
 
-We ♥ feedback, issues or pull requests. Feel free to contribute in helm-dash.
+We ♥ feedback, issues or pull requests. Feel free to contribute in dash-docs.
 
 We're trying to add tests to the project, if you send a PR please consider add
 new or update the existing ones.
 
 Install [Cask](https://github.com/cask/cask) if you haven't already, then:
 
-    $ cd /path/to/helm-dash
+    $ cd /path/to/dash-docs
     $ cask
 
 Run all tests with:
