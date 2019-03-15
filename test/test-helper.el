@@ -1,17 +1,20 @@
 (require 'undercover)
 (require 'f)
 
-(defvar helm-dash-test-path
+(unless (version< emacs-version "27")
+    (defalias 'ert--print-backtrace 'backtrace-to-string))
+
+(defvar dash-docs-test-path
   (f-dirname (f-this-file)))
 
-(defvar helm-dash-code-path
-  (f-parent helm-dash-test-path))
+(defvar dash-docs-code-path
+  (f-parent dash-docs-test-path))
 
-(defun helm-dash-ends-with (string suffix)
+(defun dash-docs-ends-with (string suffix)
   "Return t if STRING ends with SUFFIX."
   (and (string-match (format "%s$" suffix)
                      string)
        t))
 
-(undercover "*.el" "helm-dash/*.el" (:exclude "*-test.el"))
-(require 'helm-dash (f-expand "helm-dash.el" helm-dash-code-path))
+(undercover "*.el" "dash-docs/*.el" (:exclude "*-test.el"))
+(require 'dash-docs (f-expand "dash-docs.el" dash-docs-code-path))

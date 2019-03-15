@@ -512,7 +512,8 @@ Get required params to call `dash-docs-result-url' from SEARCH-RESULT."
   (cl-loop for row in (dash-docs--run-query docset pattern)
            collect (dash-docs--candidate docset row)))
 
-(defun dash-docs-search (pattern &rest _)
+;;;###autoload
+(defun dash-docs-search (pattern)
   "Given a string PATTERN, query docsets and retrieve result."
   (when (>= (length pattern) dash-docs-min-length)
     (cl-loop for docset in (dash-docs-maybe-narrow-docsets pattern)

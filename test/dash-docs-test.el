@@ -5,7 +5,6 @@
 ;; Author: Raimon Grau <raimonster@gmail.com>
 ;;         Toni Reina  <areina0@gmail.com>
 ;; Version: 0.1
-;; Package-Requires: ((helm "0.0.0"))
 ;; Keywords: docs
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -32,7 +31,7 @@
   (let ((pattern "Go ")
         (dash-docs-docsets-path "/tmp/.docsets")
         (dash-docs-common-docsets '("Redis" "Go" "CSS" "C" "C++"))
-        (dash-docs-connections
+        (dash-docs--connections
          '(("Redis" "/tmp/.docsets/Redis.docset/Contents/Resources/docSet.dsidx" "DASH")
            ("Go" "/tmp/.docsets/Go.docset/Contents/Resources/docSet.dsidx" "DASH")
            ("C" "/tmp/.docsets/C.docset/Contents/Resources/docSet.dsidx" "DASH")
@@ -50,11 +49,11 @@
   (let ((pattern "FOOOO ")
 	(dash-docs-docsets-path "/tmp/.docsets")
 	(dash-docs-common-docsets '("Redis" "Go" "CSS"))
-	(dash-docs-connections
+	(dash-docs--connections
 	 '(("Redis" "/tmp/.docsets/Redis.docset/Contents/Resources/docSet.dsidx" "DASH")
 	   ("Go" "/tmp/.docsets/Go.docset/Contents/Resources/docSet.dsidx" "DASH")
 	   ("CSS" "/tmp/.docsets/CSS.docset/Contents/Resources/docSet.dsidx" "ZDASH"))))
-    (should (equal (dash-docs-maybe-narrow-docsets pattern) dash-docs-connections))))
+    (should (equal (dash-docs-maybe-narrow-docsets pattern) dash-docs--connections))))
 
 
 ;;;; dash-docs-sub-docset-name-in-pattern
@@ -122,19 +121,19 @@
 
 (ert-deftest dash-docs-activate-docset ()
   (let ((dash-docs-common-docsets '("Redis" "Go" "CSS"))
-	(dash-docs-connections
+	(dash-docs--connections
 	 '(("Redis" "/tmp/.docsets/Redis.docset/Contents/Resources/docSet.dsidx" "DASH")
 	   ("Go" "/tmp/.docsets/Go.docset/Contents/Resources/docSet.dsidx" "DASH")
 	   ("CSS" "/tmp/.docsets/CSS.docset/Contents/Resources/docSet.dsidx" "ZDASH"))))
     (dash-docs-activate-docset "Clojure")
     (should (equal'("Clojure" "Redis" "Go" "CSS") dash-docs-common-docsets))
-    (should (equal nil dash-docs-connections))))
+    (should (equal nil dash-docs--connections))))
 
 ;; dash-docs-buffer-local-docsets
 
 (ert-deftest dash-docs-buffer-local-docsets-narrowing ()
   (let ((c-buffer nil)
-        (dash-docs-connections
+        (dash-docs--connections
          '(("Go" "/tmp/.docsets/Go.docset/Contents/Resources/docSet.dsidx" "DASH")
            ("C" "/tmp/.docsets/C.docset/Contents/Resources/docSet.dsidx" "DASH")
            ("CSS" "/tmp/.docsets/CSS.docset/Contents/Resources/docSet.dsidx" "ZDASH"))))

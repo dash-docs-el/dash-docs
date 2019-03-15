@@ -1,9 +1,9 @@
 (source gnu)
 (source melpa)
 
-(package "helm-dash" "1.0.0" "Browse Dash docsets inside emacs.")
+(package "dash-docs" "1.0.0" "Browse Dash docsets inside emacs.")
 
-(depends-on "helm")
+(depends-on "async")
 
 (development
  (depends-on "f")

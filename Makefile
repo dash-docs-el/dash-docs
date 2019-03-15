@@ -13,9 +13,9 @@ unit:
 	${CASK} exec ert-runner
 
 compile:
-	${CASK} exec ${EMACS} -Q -batch -f batch-byte-compile helm-dash.el
+	${CASK} exec ${EMACS} -Q -batch -f batch-byte-compile dash-docs.el
 
 clean-elc:
-	rm -f helm-dash.elc
+	rm -f dash-docs.elc
 
 .PHONY:	all test unit compile
