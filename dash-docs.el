@@ -38,6 +38,7 @@
 (require 'xml)
 (require 'format-spec)
 (require 'async)
+(require 'thingatpt)
 
 (defgroup dash-docs nil
   "Search Dash docsets."
@@ -287,17 +288,35 @@ If doesn't exist, it asks to create it."
   (when (dash-docs--ensure-created-docsets-path (dash-docs-docsets-path))
     (dash-docs--install-docset (car (assoc-default docset-name (dash-docs-unofficial-docsets))) docset-name)))
 
+(defun dash-docs-extract-and-get-folder (docset-temp-path)
+  "Extract DOCSET-TEMP-PATH to DASH-DOCS-DOCSETS-PATH, and return the folder that was newly extracted."
+  (with-temp-buffer
+    (let* ((call-process-args (list "tar" nil t nil))
+	   (process-args (list
+			  "xfv" docset-temp-path
+			  "-C" dash-docs-docsets-path))
+	   ;; On Windows, several elements need to be removed from filenames, see
+	   ;; https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file#naming-conventions.
+	   ;; We replace with underscores on windows. This might lead to broken links.
+	   (windows-args (list "--force-local" "--transform" "s/[<>\":?*^|]/_/g"))
+	   (result (apply #'call-process
+			  (append call-process-args process-args (when (eq system-type 'windows-nt) windows-args)))))
+      (goto-char (point-max))
+      (cond
+       ((and (not (equal result 0))
+	     ;; TODO: Adjust to proper text. Also requires correct locale.
+	     (backward-search "too long"))
+	(error "Failed to extract %s to %s. Filename too long. Consider changing `dash-docs-docsets-path' to a shorter value"))
+       ((not (equal result 0)) (error "Failed to extract %s to %s. Error: %s" docset-temp-path (dash-docs-docsets-path) result)))
+      (goto-char (point-max))
+      (replace-regexp-in-string "^x " "" (car (split-string (thing-at-point 'line) "\\." t))))))
+
 ;;;###autoload
 (defun dash-docs-install-docset-from-file (docset-tmp-path)
   "Extract the content of DOCSET-TMP-PATH, move it to `dash-docs-docsets-path` and activate the docset."
   (interactive
    (list (car (find-file-read-args "Docset Tarball: " t))))
-  (let ((docset-folder
-         (dash-docs-docset-folder-name
-          (shell-command-to-string
-           (format "tar xvf %s -C %s"
-                   (shell-quote-argument (expand-file-name docset-tmp-path))
-                   (shell-quote-argument (dash-docs-docsets-path)))))))
+  (let ((docset-folder (dash-docs-extract-and-get-folder docset-tmp-path)))
     (dash-docs-activate-docset docset-folder)
     (message (format
               "Docset installed. Add \"%s\" to dash-docs-common-docsets or dash-docs-docsets."
@@ -347,16 +366,12 @@ If doesn't exist, it asks to create it."
     (async-start
      (lambda ()
        ;; Beware! This lambda is run in it's own instance of emacs.
-       (shell-command-to-string
-        (format "tar xvf %s -C %s"
-                (shell-quote-argument docset-tar-path)
-                (shell-quote-argument docset-out-path))))
-     (lambda (shell-output)
-       (let ((docset-folder (dash-docs-docset-folder-name shell-output)))
-         (dash-docs-activate-docset docset-folder)
-         (message (format
-                   "Docset installed. Add \"%s\" to dash-docs-common-docsets or dash-docs-docsets."
-                   docset-folder)))))))
+       (dash-docs-extract-and-get-folder docset-tmp-path))
+     (lambda (docset-folder)
+       (dash-docs-activate-docset docset-folder)
+       (message (format
+                 "Docset installed. Add \"%s\" to dash-docs-common-docsets or dash-docs-docsets."
+                 docset-folder))))))
 
 (defalias 'dash-docs-update-docset 'dash-docs-install-docset)
 
@@ -369,13 +384,6 @@ If doesn't exist, it asks to create it."
   "Install DOCSET if it is not currently installed."
   (unless (dash-docs-docset-installed-p docset)
     (dash-docs-install-docset docset)))
-
-(defun dash-docs-docset-folder-name (tar-output)
-  "Return the name of the folder where the docset has been extracted.
-The argument TAR-OUTPUT should be an string with the output of a tar command."
-  (let ((last-line
-         (car (last (split-string tar-output "\n" t)))))
-    (replace-regexp-in-string "^x " "" (car (split-string last-line "\\." t)))))
 
 (defun dash-docs-get-docset-url (feed-path)
   "Parse a xml feed with docset urls and return the first url.
