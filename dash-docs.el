@@ -1,9 +1,10 @@
-;;; dash-docs.el --- Offline documentation browser for +150 APIs using Dash docsets.  -*- lexical-binding: t; -*-
+;;; dash-docs.el --- Offline documentation browser using Dash docsets.  -*- lexical-binding: t; -*-
 ;; Copyright (C) 2013-2014  Raimon Grau
 ;; Copyright (C) 2013-2014  Toni Reina
 
 ;; Author: Raimon Grau <raimonster@gmail.com>
 ;;         Toni Reina  <areina0@gmail.com>
+;;         Bryan Gilbert <bryan@bryan.sh>
 ;;
 ;; URL: http://github.com/areina/helm-dash
 ;; Version: 1.3.0
@@ -32,7 +33,6 @@
 ;;
 ;;; Code:
 
-(eval-when-compile (require 'cl))
 (require 'cl-lib)
 (require 'json)
 (require 'xml)
@@ -55,15 +55,19 @@
 If you're setting this option manually, set it to an absolute
 path.  You can use `expand-file-name' function for that."
   :set (lambda (opt val) (set opt (expand-file-name val)))
+  :type 'string
   :group 'dash-docs)
 
 (defcustom dash-docs-docsets-url "https://raw.github.com/Kapeli/feeds/master"
-  "Feeds URL for dash docsets." :group 'dash-docs)
+  "Feeds URL for dash docsets."
+  :type 'string
+  :group 'dash-docs)
 
 (defcustom dash-docs-min-length 3
   "Minimum length to start searching in docsets.
 0 facilitates discoverability, but may be a bit heavy when lots
 of docsets are active.  Between 0 and 3 is sane."
+  :type 'integer
   :group 'dash-docs)
 
 (defcustom dash-docs-candidate-format "%d %n (%t)"
@@ -73,11 +77,13 @@ Available formats are
    %n - name of the token
    %t - type of the token
    %f - file name"
+  :type 'string
   :group 'dash-docs)
 
 (defcustom dash-docs-enable-debugging t
   "When non-nil capture stderr from sql commands and display it in a buffer.
 Setting this to nil may speed up queries."
+  :type 'boolean
   :group 'dash-docs)
 
 (defvar dash-docs-common-docsets
@@ -109,6 +115,7 @@ Setting this to nil may speed up queries."
 Suggested values are:
  * `browse-url'
  * `eww'"
+  :type 'function
   :group 'dash-docs)
 
 (defun dash-docs-docsets-path ()
@@ -361,17 +368,15 @@ If doesn't exist, it asks to create it."
 (defun dash-docs-async-install-docset-from-file (docset-tmp-path)
   "Asynchronously extract the content of DOCSET-TMP-PATH, move it to `dash-docs-docsets-path` and activate the docset."
   (interactive (list (car (find-file-read-args "Docset Tarball: " t))))
-  (let ((docset-tar-path (expand-file-name docset-tmp-path))
-        (docset-out-path (dash-docs-docsets-path)))
-    (async-start
-     (lambda ()
-       ;; Beware! This lambda is run in it's own instance of emacs.
-       (dash-docs-extract-and-get-folder docset-tmp-path))
-     (lambda (docset-folder)
-       (dash-docs-activate-docset docset-folder)
-       (message (format
-                 "Docset installed. Add \"%s\" to dash-docs-common-docsets or dash-docs-docsets."
-                 docset-folder))))))
+  (async-start
+   (lambda ()
+     ;; Beware! This lambda is run in it's own instance of emacs.
+     (dash-docs-extract-and-get-folder docset-tmp-path))
+   (lambda (docset-folder)
+     (dash-docs-activate-docset docset-folder)
+     (message (format
+               "Docset installed. Add \"%s\" to dash-docs-common-docsets or dash-docs-docsets."
+               docset-folder)))))
 
 (defalias 'dash-docs-update-docset 'dash-docs-install-docset)
 
@@ -461,13 +466,13 @@ Return a list of db results.  Ex:
 First element is the display message of the candidate, rest is used to build
 candidate opts."
   (cons (format-spec dash-docs-candidate-format
-                     (list (cons ?d (first docset))
-                           (cons ?n (second row))
-                           (cons ?t (first row))
+                     (list (cons ?d (cl-first docset))
+                           (cons ?n (cl-second row))
+                           (cons ?t (cl-first row))
                            (cons ?f (replace-regexp-in-string
                                      "^.*/\\([^/]*\\)\\.html?#?.*"
                                      "\\1"
-                                     (third row)))))
+                                     (cl-third row)))))
         (list (car docset) row)))
 
 (defun dash-docs-result-url (docset-name filename &optional anchor)
@@ -500,6 +505,8 @@ Get required params to call `dash-docs-result-url' from SEARCH-RESULT."
 
 (defun dash-docs-actions (actions doc-item)
   "Return an alist with the possible ACTIONS to execute with DOC-ITEM."
+  (ignore doc-item)
+  (ignore actions)
   `(("Go to doc" . dash-docs-browse-url)
     ("Copy to clipboard" . dash-docs-add-to-kill-ring)))
 
