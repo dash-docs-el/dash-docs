@@ -7,7 +7,7 @@
 ;;         Bryan Gilbert <bryan@bryan.sh>
 ;;
 ;; URL: http://github.com/areina/helm-dash
-;; Version: 1.3.0
+;; Version: 1.4.0
 ;; Package-Requires: ((emacs "24.4") (cl-lib "0.5") (async "1.9.3"))
 ;; Keywords: docs
 
