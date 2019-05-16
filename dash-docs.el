@@ -312,14 +312,7 @@ Report an error unless a valid docset is selected."
 
 (defun dash-docs--install-docset (url docset-name)
   "Download a docset from URL and install with name DOCSET-NAME."
-  (let ((docset-tmp-path (format "%s%s-docset.tgz" temporary-file-directory docset-name))
-        (gnutls-algorithm-priority
-         (if (and dash-docs-use-workaround-for-emacs-bug
-                  (or (eq dash-docs-use-workaround-for-emacs-bug 'force)
-                      (and (not gnutls-algorithm-priority)
-                           (< emacs-major-version 27))))
-             "NORMAL:-VERS-TLS1.3"
-           gnutls-algorithm-priority)))
+  (let ((docset-tmp-path (format "%s%s-docset.tgz" temporary-file-directory docset-name)))
     (dash-docs-with-emacs-bug-workaround
      (url-copy-file url docset-tmp-path t))
     (dash-docs-install-docset-from-file docset-tmp-path)))
