@@ -39,6 +39,7 @@
 (require 'format-spec)
 (require 'async)
 (require 'thingatpt)
+(require 'gnutls)
 
 (defgroup dash-docs nil
   "Search Dash docsets."
