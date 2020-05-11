@@ -340,7 +340,7 @@ If doesn't exist, it asks to create it."
     (let* ((call-process-args (list "tar" nil t nil))
 	   (process-args (list
 			  "xfv" docset-temp-path
-			  "-C" dash-docs-docsets-path))
+			  "-C" (dash-docs-docsets-path)))
 	   ;; On Windows, several elements need to be removed from filenames, see
 	   ;; https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file#naming-conventions.
 	   ;; We replace with underscores on windows. This might lead to broken links.
