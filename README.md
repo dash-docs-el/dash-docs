@@ -10,7 +10,7 @@
 ## What's it
 
 This package provides an elisp interface to query and show documenation using
-[Dash](http://www.kapeli.com/dash) docsets. 
+[Dash](http://www.kapeli.com/dash) docsets.
 
 It doesn't require Dash app.
 
@@ -48,15 +48,15 @@ as explained [here](https://kapeli.com/docsets#dashdocsetfeed).
 
 ## Usage
 
-Search all currently enabled docsets (docsets in `dash-docs-docsets` or 
+Search all currently enabled docsets (docsets in `dash-docs-docsets` or
 `dash-docs-common-docsets`):
 
     (dash-docs-search "<pattern>")
-    
+
 Search a specific docset:
 
     (dash-docs-search-docset "<docset>" "<pattern>")
-    
+
 The command `dash-docs-reset-connections` will clear the connections
 to all sqlite db's. Use it in case of errors when adding new docsets.
 The next call to a search function will recreate them.
@@ -106,6 +106,42 @@ docsets sets.
 To narrow the search to just one docset, type its name in the
 beginning of the search followed by a space. If the docset contains
 spaces, no problemo, we handle it :D.
+
+### use-package integration
+
+If you are using [use-package](https://github.com/jwiegley/use-package), a :dash
+keyboard will be added to configure the `dash-docs-docsets` variable. For
+example to register the CMake dash documentation with cmake mode:
+
+``` elisp
+(use-package cmake-mode
+  :dash "CMake")
+```
+
+You can also register multiple docsets:
+``` elisp
+(use-package cmake-mode
+  :dash "CMake" "Foobar")
+```
+
+By default, dash-docs will link the docset to the package name mode hook, you
+can explicitly set the mode if it is different from the package name:
+
+``` elisp
+(use-package my-package
+  :dash (my-mode "Docset1" "Docset2"))
+```
+
+And you can register to multiple modes:
+
+``` elisp
+(use-package my-package
+  :dash (my-mode "Docset1" "Docset2")
+        (my-other-mode "Docset3"))
+```
+
+The way it works is by registering a hook to the given mode (`<mode-name>-hook`)
+and setting up `dash-docs-docsets` local variable in that hook.
 
 ## FAQ
 

@@ -574,6 +574,9 @@ Get required params to call `dash-docs-result-url' from SEARCH-RESULT."
     (cl-loop for docset in (dash-docs-maybe-narrow-docsets pattern)
              appending (dash-docs-search-docset docset pattern))))
 
+;; Extend use package with :dash keyword if available
+(when (featurep 'use-package) (require 'use-package-dash-docs))
+
 (provide 'dash-docs)
 
 ;;; dash-docs.el ends here
