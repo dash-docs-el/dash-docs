@@ -147,7 +147,7 @@ If there are errors, print them in `dash-docs-debugging-buffer'"
                          (make-temp-file "dash-docs-errors-file"))))
        (call-process "sqlite3" nil (list standard-output error-file) nil
                      ;; args for sqlite3:
-                     "-list" "-init" "''" db-path sql)
+                     "-list" "-init" null-device db-path sql)
 
        ;; display errors, stolen from emacs' `shell-command` function
        (when (and error-file (file-exists-p error-file))
